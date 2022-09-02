@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_complete_guide/widgets/new_transaction.dart';
+import './widgets/chart.dart';
+import './widgets/new_transaction.dart';
 import './models/transaction.dart';
 import './widgets/transaction_list.dart';
 
@@ -15,10 +16,12 @@ class MyApp extends StatelessWidget {
           accentColor: Colors.amber,
           fontFamily: 'Quicksand',
           textTheme: ThemeData.light().textTheme.copyWith(
-              titleMedium: TextStyle(
-                  fontFamily: 'OpenSans',
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold)),
+                titleLarge: TextStyle(
+                    fontFamily: 'OpenSans',
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold),
+                //button: TextStyle(color: Colors.white) ERROR
+              ),
           appBarTheme: AppBarTheme(
               titleTextStyle: TextStyle(
                   fontFamily: 'OpenSans',
@@ -36,51 +39,58 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   final List<Transaction> _userTransactions = [
-    Transaction(
-        id: '001', title: 'New shoes', amount: 99.99, date: DateTime.now()),
-    Transaction(
-        id: '002',
-        title: 'Weekly groceries',
-        amount: 16.53,
-        date: DateTime.now()),
-    Transaction(
-        id: '002',
-        title: 'Weekly groceries',
-        amount: 16.53,
-        date: DateTime.now()),
-    Transaction(
-        id: '002',
-        title: 'Weekly groceries',
-        amount: 16.53,
-        date: DateTime.now()),
-    Transaction(
-        id: '002',
-        title: 'Weekly groceries',
-        amount: 16.53,
-        date: DateTime.now()),
-    Transaction(
-        id: '002',
-        title: 'Weekly groceries',
-        amount: 16.53,
-        date: DateTime.now()),
-    Transaction(
-        id: '002',
-        title: 'Weekly groceries',
-        amount: 16.53,
-        date: DateTime.now()),
-    Transaction(
-        id: '002',
-        title: 'Weekly groceries',
-        amount: 16.53,
-        date: DateTime.now()),
+    // Transaction(
+    //     id: '001', title: 'New shoes', amount: 99.99, date: DateTime.now()),
+    // Transaction(
+    //     id: '002',
+    //     title: 'Weekly groceries',
+    //     amount: 16.53,
+    //     date: DateTime.now()),
+    // Transaction(
+    //     id: '002',
+    //     title: 'Weekly groceries',
+    //     amount: 16.53,
+    //     date: DateTime.now()),
+    // Transaction(
+    //     id: '002',
+    //     title: 'Weekly groceries',
+    //     amount: 16.53,
+    //     date: DateTime.now()),
+    // Transaction(
+    //     id: '002',
+    //     title: 'Weekly groceries',
+    //     amount: 16.53,
+    //     date: DateTime.now()),
+    // Transaction(
+    //     id: '002',
+    //     title: 'Weekly groceries',
+    //     amount: 16.53,
+    //     date: DateTime.now()),
+    // Transaction(
+    //     id: '002',
+    //     title: 'Weekly groceries',
+    //     amount: 16.53,
+    //     date: DateTime.now()),
+    // Transaction(
+    //     id: '002',
+    //     title: 'Weekly groceries',
+    //     amount: 16.53,
+    //     date: DateTime.now()),
   ];
 
-  void _addNewTransaction(String title, double amount) {
+  List<Transaction> get _recentTransactions {
+    return _userTransactions.where((transaction) {
+      final dateSevenDaysAgo = DateTime.now().subtract(Duration(days: 7));
+      return transaction.date.isAfter(dateSevenDaysAgo);
+    }).toList();
+  }
+
+  void _addNewTransaction(String title, double amount, DateTime date) {
     final newTransaction = Transaction(
         id: DateTime.now().toString(),
         title: title,
         amount: amount,
-        date: DateTime.now());
+        date: date);
     setState(() {
       _userTransactions.add(newTransaction);
     });
@@ -96,6 +106,12 @@ class _MyHomePageState extends State<MyHomePage> {
             behavior: HitTestBehavior.opaque,
           );
         });
+  }
+
+  void _deleteTransaction(String id) {
+    setState(() {
+      _userTransactions.removeWhere((transaction) => transaction.id == id);
+    });
   }
 
   @override
@@ -114,15 +130,8 @@ class _MyHomePageState extends State<MyHomePage> {
           //mainAxisAlignment: MainAxisAlignment.spaceAround,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Container(
-              width: double.infinity,
-              child: Card(
-                color: Colors.blue,
-                child: Text('CHART!'),
-                elevation: 5,
-              ),
-            ),
-            TransactionList(_userTransactions)
+            Chart(_recentTransactions),
+            TransactionList(_userTransactions, _deleteTransaction)
           ],
         ),
       ),
