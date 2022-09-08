@@ -13,23 +13,25 @@ class TransactionList extends StatelessWidget {
     return Container(
       height: 400,
       child: transactions.isEmpty
-          ? Column(
-              children: [
-                Text(
-                  'No transactions added yet.',
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                Container(
-                    height: 200,
-                    child: Image.asset(
-                      'assets/images/waiting.png',
-                      fit: BoxFit.cover,
-                    ))
-              ],
-            )
+          ? LayoutBuilder(builder: (context, constraints) {
+              return Column(
+                children: [
+                  Text(
+                    'No transactions added yet.',
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Container(
+                      height: constraints.maxHeight * 0.6,
+                      child: Image.asset(
+                        'assets/images/waiting.png',
+                        fit: BoxFit.cover,
+                      ))
+                ],
+              );
+            })
           : ListView.builder(
               itemCount: transactions.length,
               itemBuilder: (listContext, index) {
@@ -53,12 +55,20 @@ class TransactionList extends StatelessWidget {
                       DateFormat.yMMMd().format(transactions[index].date),
                       style: TextStyle(color: Colors.grey),
                     ),
-                    trailing: IconButton(
-                      icon: Icon(Icons.delete),
-                      color: Theme.of(context).errorColor,
-                      onPressed: () =>
-                          deleteTransactionHandler(transactions[index].id),
-                    ),
+                    trailing: MediaQuery.of(context).size.width > 460
+                        ? FlatButton.icon(
+                            icon: Icon(Icons.delete),
+                            textColor: Theme.of(context).errorColor,
+                            label: Text('Delete'),
+                            onPressed: () => deleteTransactionHandler(
+                                transactions[index].id),
+                          )
+                        : IconButton(
+                            icon: Icon(Icons.delete),
+                            color: Theme.of(context).errorColor,
+                            onPressed: () => deleteTransactionHandler(
+                                transactions[index].id),
+                          ),
                   ),
                 );
               },
